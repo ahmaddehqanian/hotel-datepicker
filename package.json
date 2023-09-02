@@ -50,7 +50,8 @@
     "rollup-plugin-minification": "^0.2.0"
   },
   "dependencies": {
-    "fecha": "^4.2.3"
+    "jalaali-js": "^1.2.6",
+    "moment-jalaali": "^0.10.0"
   },
   "browserslist": [
     "defaults and supports es6-module",

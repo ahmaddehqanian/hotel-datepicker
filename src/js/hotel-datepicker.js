@@ -2,7 +2,7 @@
 /* global fecha, DocumentTouch */
 /* eslint-disable no-multi-assign */
 
-import * as fecha from "fecha";
+import * as fecha from "jalaali-js";
 
 let idCounter = 0;
 

@@ -1,5 +1,5 @@
 /*! hotel-datepicker 4.6.1 - Copyright 2022 Benito Lopez (http://lopezb.com) - https://github.com/benitolopez/hotel-datepicker - MIT */
-import * as fecha from 'fecha';
+import * as fecha from 'moment-jalaali';
 
 let idCounter = 0;
 class HotelDatepicker {

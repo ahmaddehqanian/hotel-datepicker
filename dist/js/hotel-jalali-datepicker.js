@@ -1,25 +1,8 @@
-/*! hotel-datepicker 4.6.1 - Copyright 2022 Benito Lopez (http://lopezb.com) - https://github.com/benitolopez/hotel-datepicker - MIT */
-var HotelDatepicker = (function (fecha) {
+var HotelDatepicker = (function (moment) {
     'use strict';
 
-    function _interopNamespaceDefault(e) {
-        var n = Object.create(null);
-        if (e) {
-            Object.keys(e).forEach(function (k) {
-                if (k !== 'default') {
-                    var d = Object.getOwnPropertyDescriptor(e, k);
-                    Object.defineProperty(n, k, d.get ? d : {
-                        enumerable: true,
-                        get: function () { return e[k]; }
-                    });
-                }
-            });
-        }
-        n.default = e;
-        return Object.freeze(n);
-    }
 
-    var fecha__namespace = /*#__PURE__*/_interopNamespaceDefault(fecha);
+    var fecha__namespace = /*#__PURE__*/moment;
 
     let idCounter = 0;
     class HotelDatepicker {
@@ -67,10 +50,10 @@ var HotelDatepicker = (function (fecha) {
           submitButton: "Submit",
           "checkin-disabled": "Check-in disabled",
           "checkout-disabled": "Check-out disabled",
-          "day-names-short": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+          "day-names-short": ["یک شنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه", "شنبه"],
           "day-names": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
           "month-names-short": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-          "month-names": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+          "month-names": ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
           "error-more": "Date range should not be more than 1 night",
           "error-more-plural": "Date range should not be more than %d nights",
           "error-less": "Date range should not be less than 1 night",
@@ -139,14 +122,6 @@ var HotelDatepicker = (function (fecha) {
       static getNewId() {
         return ++idCounter;
       }
-      setFechaI18n() {
-        fecha__namespace.setGlobalDateI18n({
-          dayNamesShort: this.i18n["day-names-short"],
-          dayNames: this.i18n["day-names"],
-          monthNamesShort: this.i18n["month-names-short"],
-          monthNames: this.i18n["month-names"]
-        });
-      }
       getWeekDayNames() {
         let week = "";
 
@@ -208,15 +183,17 @@ var HotelDatepicker = (function (fecha) {
       }
       getDateString(date) {
         let format = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.format;
-        // Format date
-        this.setFechaI18n();
-        return fecha__namespace.format(date, format);
+        date = new Date(date);
+        // Format date shamsi
+        fecha__namespace = moment(date, format).locale('fa').format(format);
+        return fecha__namespace;
       }
       parseDate(date) {
         let format = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.format;
-        // Parse a date object
-        this.setFechaI18n();
-        return fecha__namespace.parse(date, format);
+        // Parse a date object miladi
+        fecha__namespace = moment(date, 'jYYYY-jM-jD').format('YYYY-M-D');
+        
+        return fecha__namespace;
       }
       init() {
         // DOM container
@@ -469,13 +446,13 @@ var HotelDatepicker = (function (fecha) {
         date.setHours(0, 0, 0, 0);
 
         // Show month table and create the necessary HTML code
-        const name = this.getMonthName(date.getMonth());
+        const name = this.getMonthName((moment(date, 'YYYY/M/D').format('jM')-1));
         const monthDom = this.getMonthDom(month);
         const monthName = monthDom.getElementsByClassName("datepicker__month-name")[0];
         const monthBody = monthDom.getElementsByTagName("tbody")[0];
 
         // Month caption
-        monthName.textContent = name + " " + date.getFullYear();
+        monthName.textContent = name + " " + moment(date, 'YYYY/M/D').format('jYYYY');
 
         // Remove child elements before to insert the new month
         this.emptyElement(monthBody);
@@ -490,6 +467,7 @@ var HotelDatepicker = (function (fecha) {
         this["month" + month] = date;
       }
       createMonthDomString(_date) {
+        
         const days = [];
         let html = "";
         let valid;
@@ -610,7 +588,8 @@ var HotelDatepicker = (function (fecha) {
             }
 
             // Create the day HTML
-            html += '<td class="' + dayAttributes.class + '" ' + this.printAttributes(dayAttributes) + ">" + _day.day + extraText + "</td>";
+            var day_day = moment(_day.date).format('jD');
+            html += '<td class="' + dayAttributes.class + '" ' + this.printAttributes(dayAttributes) + ">" + day_day + extraText + "</td>";
           }
           html += "</tr>";
         }
@@ -832,6 +811,7 @@ var HotelDatepicker = (function (fecha) {
 
         // Get dates from input value
         const value = this.getValue();
+        
         const dates = value ? value.split(this.separator) : "";
 
         // If we have our two dates, set the date range
@@ -858,7 +838,6 @@ var HotelDatepicker = (function (fecha) {
             if (this.start && !this.end) {
               this.clearSelection();
             }
-
             // Show months
             this.showMonth(defaultTime, 1);
             this.showMonth(this.getNextMonth(defaultTime), 2);
@@ -867,12 +846,11 @@ var HotelDatepicker = (function (fecha) {
         }
       }
       setDateRange(date1, date2) {
+        
+        date1 = new Date(date1);
+        date2 = new Date(date2);
         let onresize = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
         // Swap dates if needed
-        console.log("parse1:");
-        console.log(date1);
-        console.log("get time :");
-        console.log(date1.getTime());
         if (date1.getTime() > date2.getTime()) {
           let tmp = date2;
           date2 = date1;
@@ -1631,7 +1609,6 @@ var HotelDatepicker = (function (fecha) {
       parseDisabledDates() {
         // Sort disabled dates and store it in property
         const _tmp = [];
-        this.setFechaI18n();
         for (let i = 0; i < this.disabledDates.length; i++) {
           _tmp[i] = fecha__namespace.parse(this.disabledDates[i], "YYYY-MM-DD");
         }
@@ -1804,22 +1781,23 @@ var HotelDatepicker = (function (fecha) {
         const days = this.datepicker.getElementsByTagName("td");
         for (let i = 0; i < days.length; i++) {
           const classes = days[i].className;
-          const time = parseInt(days[i].getAttribute("time"), 10);
+          var time = parseInt(days[i].getAttribute("time"), 10);
+          time = new Date(time);
           let ariaDisabled = "false";
           let ariaLabel = "";
           if (classes.includes("datepicker__month-day--invalid")) {
-            ariaLabel = this.replacei18n(this.i18n["aria-disabled"], fecha__namespace.format(time, this.ariaDayFormat));
+            ariaLabel = this.replacei18n(this.i18n["aria-disabled"], moment(time, this.ariaDayFormat).locale('fa').format(this.ariaDayFormat));
             ariaDisabled = "true";
           } else if (classes.includes("datepicker__month-day--first-day-selected")) {
-            ariaLabel = this.replacei18n(this.i18n["aria-selected-checkin"], fecha__namespace.format(time, this.ariaDayFormat));
+            ariaLabel = this.replacei18n(this.i18n["aria-selected-checkin"], moment(time, this.ariaDayFormat).locale('fa').format(this.ariaDayFormat));
           } else if (classes.includes("datepicker__month-day--last-day-selected")) {
-            ariaLabel = this.replacei18n(this.i18n["aria-selected-checkout"], fecha__namespace.format(time, this.ariaDayFormat));
+            ariaLabel = this.replacei18n(this.i18n["aria-selected-checkout"], moment(time, this.ariaDayFormat).locale('fa').format(this.ariaDayFormat));
           } else if (classes.includes("datepicker__month-day--selected")) {
-            ariaLabel = this.replacei18n(this.i18n["aria-selected"], fecha__namespace.format(time, this.ariaDayFormat));
+            ariaLabel = this.replacei18n(this.i18n["aria-selected"], moment(time, this.ariaDayFormat).locale('fa').format(this.ariaDayFormat));
           } else if (this.start && !this.end) {
-            ariaLabel = this.replacei18n(this.i18n["aria-choose-checkout"], fecha__namespace.format(time, this.ariaDayFormat));
+            ariaLabel = this.replacei18n(this.i18n["aria-choose-checkout"], moment(time, this.ariaDayFormat).locale('fa').format(this.ariaDayFormat));
           } else {
-            ariaLabel = this.replacei18n(this.i18n["aria-choose-checkin"], fecha__namespace.format(time, this.ariaDayFormat));
+            ariaLabel = this.replacei18n(this.i18n["aria-choose-checkin"], moment(time, this.ariaDayFormat).locale('fa').format(this.ariaDayFormat));
           }
           if (ariaLabel) {
             days[i].setAttribute("aria-label", ariaLabel);
@@ -2099,4 +2077,4 @@ var HotelDatepicker = (function (fecha) {
 
     return HotelDatepicker;
 
-})(fecha);
+})(moment);
